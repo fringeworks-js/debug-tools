@@ -1,6 +1,6 @@
 # @fringeworks/debug-tools
 
-`@fringeworks/debug-tools` は、開発中にプログラムの動き（かかった時間など）を測る・見るための道具を集めた、誰かにとっては便利なライブラリです。
+`@fringeworks/debug-tools` は、プログラムの動き（かかった時間など）や値（入れ子のデータの中身など）を調べるための道具を集めた、誰かにとっては便利なライブラリです。
 
 **[English README is available here](./README.md)**
 
@@ -25,12 +25,14 @@ import measureTime from '@fringeworks/debug-tools/measureTime';
 
 ## API
 
-| 関数                             | 説明                                                 |
-| -------------------------------- | ---------------------------------------------------- |
-| `compareTime(options)`           | 複数の関数の実行時間を測定して比較する               |
-| `compareTimeAsync(options)`      | 複数の非同期関数の実行時間を測定して比較する         |
-| `measureTime(fn, options?)`      | 関数を指定の回数実行し、かかった時間を測定する       |
-| `measureTimeAsync(fn, options?)` | 非同期関数を指定の回数実行し、かかった時間を測定する |
+| 関数                                        | 説明                                                 |
+| ------------------------------------------- | ---------------------------------------------------- |
+| `compareTime(options)`                      | 複数の関数の実行時間を測定して比較する               |
+| `compareTimeAsync(options)`                 | 複数の非同期関数の実行時間を測定して比較する         |
+| `measureTime(fn, options?)`                 | 関数を指定の回数実行し、かかった時間を測定する       |
+| `measureTimeAsync(fn, options?)`            | 非同期関数を指定の回数実行し、かかった時間を測定する |
+| `searchByKeys(data, condition, options?)`   | 入れ子のデータから、キーが条件に合うところを探す     |
+| `searchByValues(data, condition, options?)` | 入れ子のデータから、値が条件に合うところを探す       |
 
 ### `compareTime`
 
@@ -121,6 +123,59 @@ measureTimeAsync<A extends unknown[], R>(fn: (...args: A) => Promise<R>, options
 
 `measureTime` の非同期関数版です。`fn` を1回ずつ順番に実行し、完了を待ってから次を実行します。オプションと戻り値は `measureTime` と同じです。
 
+### `searchByKeys`
+
+```ts
+searchByKeys(data: unknown, condition: StringCondition, options?: SearchByKeysOptions): unknown
+```
+
+入れ子の配列・オブジェクトから、キーが `condition` に合うプロパティを探し、そこに通じる道筋だけを残した新しい値を返します。条件に合ったキーの値は、そのまま残します。1つも無い場合は `null` を返します。JSON ビューアーの検索のように、大きなデータのどこに目的のものがあるかを見るときに使います。
+
+- 条件は `@fringeworks/utils` の `createStringMatcher` と同じルールで比べます。文字列は完全一致で、部分一致などは `{ includes }`・`{ startsWith }`・`{ endsWith }`・`{ matches }` で書きます。配列は、どれかに合えば一致します
+- 配列は要素の位置を保ちます。合わなかった要素は穴（空き）になります。配列の添字はキーとして比べません
+- 素のオブジェクト（オブジェクトリテラル・JSON から作ったものなど）と配列だけをたどります。`Map`・`Set`・クラスのインスタンスなどはたどりません
+- 循環参照があっても終わります（たどっている道筋の上にあるオブジェクトは、もうたどりません）
+- 一致したノードのほかのプロパティは残らないため、ツリーの一覧の絞り込み（ノードをそのまま残す）には向きません
+
+```ts
+const data = {
+  user: { name: 'Alice', profile: { nickname: 'A', age: 20 } },
+  items: [{ id: 1, name: 'apple' }, { id: 2 }],
+};
+searchByKeys(data, 'name'); // { user: { name: 'Alice' }, items: [{ name: 'apple' }] }
+searchByKeys(data, { includes: 'name' }); // { user: { name: 'Alice', profile: { nickname: 'A' } }, items: [{ name: 'apple' }] }
+searchByKeys(data, 'none'); // null
+```
+
+| オプション    | 型                          | 説明                                                                     |
+| ------------- | --------------------------- | ------------------------------------------------------------------------ |
+| `ignoreCase?` | `boolean`                   | `true` の場合、大文字・小文字を区別しない。デフォルトは `false`          |
+| `normalize?`  | `(value: string) => string` | 比べる前に文字列を正規化する関数（`createStringMatcher` の `normalize`） |
+
+### `searchByValues`
+
+```ts
+searchByValues(data: unknown, condition: StringCondition, options?: SearchByValuesOptions): unknown
+```
+
+入れ子の配列・オブジェクトから、値が `condition` に合うものを探し、そこに通じる道筋だけを残した新しい値を返します。1つも無い場合は `null` を返します。
+
+- 文字列・数値・真偽値・bigint の値を、表示されている文字のまま（文字列にして）比べます。`null`・`undefined`・関数などは条件に合いません
+- 条件の比べ方、配列の扱い、たどる範囲、循環参照の扱い、オプションは `searchByKeys` と同じです
+
+```ts
+const data = {
+  user: { name: 'Alice', age: 20 },
+  items: [
+    { id: 1, label: 'apple' },
+    { id: 12, label: 'Apple pie' },
+  ],
+};
+searchByValues(data, 'Alice'); // { user: { name: 'Alice' } }
+searchByValues(data, '20'); // { user: { age: 20 } }
+searchByValues(data, { includes: 'apple' }, { ignoreCase: true }); // { items: [{ label: 'apple' }, { label: 'Apple pie' }] }
+```
+
 ### 型
 
 | 型                              | 説明                                                                                                     |
@@ -136,6 +191,8 @@ measureTimeAsync<A extends unknown[], R>(fn: (...args: A) => Promise<R>, options
 | `MeasureTimeResult<R>`          | `measureTime` の戻り値                                                                                   |
 | `MeasureTimeAsyncOptions<A>`    | `MeasureTimeOptions<A>` と同じ                                                                           |
 | `MeasureTimeAsyncResult<R>`     | `MeasureTimeResult<R>` と同じ                                                                            |
+| `SearchByKeysOptions`           | `searchByKeys` のオプション（`@fringeworks/utils` の `CreateStringMatcherOptions` と同じ）               |
+| `SearchByValuesOptions`         | `searchByValues` のオプション（`@fringeworks/utils` の `CreateStringMatcherOptions` と同じ）             |
 
 ## ライセンス
 

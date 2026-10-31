@@ -1,6 +1,6 @@
 # @fringeworks/debug-tools
 
-`@fringeworks/debug-tools` is a library some will find handy, offering tools for measuring and observing how a program behaves during development.
+`@fringeworks/debug-tools` is a library some will find handy, offering tools for examining how a program behaves (such as time taken) and what its values hold (such as the contents of nested data).
 
 **[日本語のREADMEはこちら](./README.ja.md)**
 
@@ -25,12 +25,14 @@ import measureTime from '@fringeworks/debug-tools/measureTime';
 
 ## API
 
-| Function                         | Description                                                          |
-| -------------------------------- | -------------------------------------------------------------------- |
-| `compareTime(options)`           | Measures and compares the execution time of several functions        |
-| `compareTimeAsync(options)`      | Measures and compares the execution time of several async functions  |
-| `measureTime(fn, options?)`      | Runs a function a number of times and measures the time taken        |
-| `measureTimeAsync(fn, options?)` | Runs an async function a number of times and measures the time taken |
+| Function                                    | Description                                                          |
+| ------------------------------------------- | -------------------------------------------------------------------- |
+| `compareTime(options)`                      | Measures and compares the execution time of several functions        |
+| `compareTimeAsync(options)`                 | Measures and compares the execution time of several async functions  |
+| `measureTime(fn, options?)`                 | Runs a function a number of times and measures the time taken        |
+| `measureTimeAsync(fn, options?)`            | Runs an async function a number of times and measures the time taken |
+| `searchByKeys(data, condition, options?)`   | Searches nested data for properties whose keys match a condition     |
+| `searchByValues(data, condition, options?)` | Searches nested data for values that match a condition               |
 
 ### `compareTime`
 
@@ -121,6 +123,59 @@ measureTimeAsync<A extends unknown[], R>(fn: (...args: A) => Promise<R>, options
 
 The async-function version of `measureTime`. Runs `fn` one call at a time, waiting for each to finish. The options and the result are the same as `measureTime`.
 
+### `searchByKeys`
+
+```ts
+searchByKeys(data: unknown, condition: StringCondition, options?: SearchByKeysOptions): unknown
+```
+
+Searches nested arrays and objects for properties whose keys match `condition`, and returns a new value that keeps only the paths leading to them. The values of matching keys are kept as they are. Returns `null` if nothing matches. Use it to see where things are in large data, like the search of a JSON viewer.
+
+- Conditions are compared by the same rules as `createStringMatcher` of `@fringeworks/utils`. A string is an exact match; write partial matches and the like as `{ includes }`, `{ startsWith }`, `{ endsWith }`, or `{ matches }`. An array matches when any of its conditions matches
+- Arrays keep the positions of their elements. Elements that do not match become holes. Array indexes are not compared as keys
+- Only plain objects (object literals, objects created from JSON, and so on) and arrays are traversed. `Map`, `Set`, class instances, and the like are not traversed
+- It finishes even with circular references (objects on the path being traversed are not traversed again)
+- Other properties of matching nodes are not kept, so it is not suited to filtering tree lists (which keeps nodes as they are)
+
+```ts
+const data = {
+  user: { name: 'Alice', profile: { nickname: 'A', age: 20 } },
+  items: [{ id: 1, name: 'apple' }, { id: 2 }],
+};
+searchByKeys(data, 'name'); // { user: { name: 'Alice' }, items: [{ name: 'apple' }] }
+searchByKeys(data, { includes: 'name' }); // { user: { name: 'Alice', profile: { nickname: 'A' } }, items: [{ name: 'apple' }] }
+searchByKeys(data, 'none'); // null
+```
+
+| Option        | Type                        | Description                                                                                 |
+| ------------- | --------------------------- | ------------------------------------------------------------------------------------------- |
+| `ignoreCase?` | `boolean`                   | If `true`, case is ignored. Defaults to `false`                                             |
+| `normalize?`  | `(value: string) => string` | A function that normalizes strings before comparison (`normalize` of `createStringMatcher`) |
+
+### `searchByValues`
+
+```ts
+searchByValues(data: unknown, condition: StringCondition, options?: SearchByValuesOptions): unknown
+```
+
+Searches nested arrays and objects for values that match `condition`, and returns a new value that keeps only the paths leading to them. Returns `null` if nothing matches.
+
+- Strings, numbers, booleans, and bigints are compared as they are displayed (converted to strings). `null`, `undefined`, functions, and the like never match
+- How conditions are compared, how arrays are handled, what is traversed, circular references, and the options are the same as `searchByKeys`
+
+```ts
+const data = {
+  user: { name: 'Alice', age: 20 },
+  items: [
+    { id: 1, label: 'apple' },
+    { id: 12, label: 'Apple pie' },
+  ],
+};
+searchByValues(data, 'Alice'); // { user: { name: 'Alice' } }
+searchByValues(data, '20'); // { user: { age: 20 } }
+searchByValues(data, { includes: 'apple' }, { ignoreCase: true }); // { items: [{ label: 'apple' }, { label: 'Apple pie' }] }
+```
+
 ### Types
 
 | Type                            | Description                                                                                                                  |
@@ -136,6 +191,8 @@ The async-function version of `measureTime`. Runs `fn` one call at a time, waiti
 | `MeasureTimeResult<R>`          | The return value of `measureTime`                                                                                            |
 | `MeasureTimeAsyncOptions<A>`    | Same as `MeasureTimeOptions<A>`                                                                                              |
 | `MeasureTimeAsyncResult<R>`     | Same as `MeasureTimeResult<R>`                                                                                               |
+| `SearchByKeysOptions`           | Options for `searchByKeys` (same as `CreateStringMatcherOptions` of `@fringeworks/utils`)                                    |
+| `SearchByValuesOptions`         | Options for `searchByValues` (same as `CreateStringMatcherOptions` of `@fringeworks/utils`)                                  |
 
 ## License
 
