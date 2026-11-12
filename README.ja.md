@@ -8,8 +8,6 @@
 
 ```bash
 npm install @fringeworks/debug-tools
-# または
-pnpm add @fringeworks/debug-tools
 ```
 
 ## 使い方
@@ -178,21 +176,25 @@ searchByValues(data, { includes: 'apple' }, { ignoreCase: true }); // { items: [
 
 ### 型
 
-| 型                              | 説明                                                                                                     |
-| ------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| `CompareTimeOptions<A, R>`      | `compareTime` のオプション                                                                               |
-| `CompareTimeResult<A, R>`       | `compareTime` の戻り値                                                                                   |
-| `CompareTimeTarget<A, R>`       | 測定する関数 `{ id, fn }`                                                                                |
-| `CompareTimeAsyncOptions<A, R>` | `CompareTimeOptions<A, Promise<R>>` と同じ                                                               |
-| `CompareTimeAsyncResult<A, R>`  | `compareTimeAsync` の戻り値。`order` の関数が `Promise<R>` を返す以外は `CompareTimeResult<A, R>` と同じ |
-| `ElapsedTimes`                  | 関数の ID ごとの時間 `{ [id: string]: number }`                                                          |
-| `MeasureTimeArgsOptions<A>`     | 関数に渡す引数のオプション（`args` / `getArgs`）                                                         |
-| `MeasureTimeOptions<A>`         | `measureTime` のオプション                                                                               |
-| `MeasureTimeResult<R>`          | `measureTime` の戻り値                                                                                   |
-| `MeasureTimeAsyncOptions<A>`    | `MeasureTimeOptions<A>` と同じ                                                                           |
-| `MeasureTimeAsyncResult<R>`     | `MeasureTimeResult<R>` と同じ                                                                            |
-| `SearchByKeysOptions`           | `searchByKeys` のオプション（`@fringeworks/utils` の `CreateStringMatcherOptions` と同じ）               |
-| `SearchByValuesOptions`         | `searchByValues` のオプション（`@fringeworks/utils` の `CreateStringMatcherOptions` と同じ）             |
+| 型                              | 説明                                                                                                           |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `CompareTimeOptions<A, R>`      | `compareTime` のオプション                                                                                     |
+| `CompareTimeResult<A, R>`       | `compareTime` の戻り値                                                                                         |
+| `CompareTimeTarget<A, R>`       | 測定する関数 `{ id, fn }`                                                                                      |
+| `CompareTimeAsyncOptions<A, R>` | `CompareTimeOptions<A, Promise<R>>` と同じ                                                                     |
+| `CompareTimeAsyncResult<A, R>`  | `compareTimeAsync` の戻り値。`order` の関数が `Promise<R>` を返す以外は `CompareTimeResult<A, R>` と同じ       |
+| `ElapsedTimes`                  | 関数の ID ごとの時間 `{ [id: string]: number }`                                                                |
+| `MeasureTimeArgsOptions<A>`     | 関数に渡す引数のオプション（`args` / `getArgs`）                                                               |
+| `MeasureTimeOptions<A>`         | `measureTime` のオプション                                                                                     |
+| `MeasureTimeResult<R>`          | `measureTime` の戻り値                                                                                         |
+| `MeasureTimeAsyncOptions<A>`    | `MeasureTimeOptions<A>` と同じ                                                                                 |
+| `MeasureTimeAsyncResult<R>`     | `MeasureTimeResult<R>` と同じ                                                                                  |
+| `SearchByKeysOptions`           | `searchByKeys` のオプション（`@fringeworks/utils` の `CreateStringMatcherOptions` と同じ）                     |
+| `SearchByValuesOptions`         | `searchByValues` のオプション（`@fringeworks/utils` の `CreateStringMatcherOptions` と同じ）                   |
+| `StringComparison`              | 文字列の比べ方 `{ includes?, startsWith?, endsWith?, matches? }`（`@fringeworks/utils` の型）                  |
+| `StringCondition`               | `searchByKeys`・`searchByValues` の `condition`（`StringConditionItem` かその配列。`@fringeworks/utils` の型） |
+| `StringConditionItem`           | 文字列の条件の1つ（文字列・`RegExp`・`StringComparison`・`StringPredicate`。`@fringeworks/utils` の型）        |
+| `StringPredicate`               | 文字列が条件に合うかを判定する関数 `(value: string) => boolean`（`@fringeworks/utils` の型）                   |
 
 ## ライセンス
 

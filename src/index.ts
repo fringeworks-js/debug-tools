@@ -4,3 +4,4 @@ export * from './measureTime';
 export * from './measureTimeAsync';
 export * from './searchByKeys';
 export * from './searchByValues';
+export type * from './types';

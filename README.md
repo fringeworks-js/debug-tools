@@ -8,8 +8,6 @@
 
 ```bash
 npm install @fringeworks/debug-tools
-# or
-pnpm add @fringeworks/debug-tools
 ```
 
 ## Usage
@@ -178,21 +176,25 @@ searchByValues(data, { includes: 'apple' }, { ignoreCase: true }); // { items: [
 
 ### Types
 
-| Type                            | Description                                                                                                                  |
-| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `CompareTimeOptions<A, R>`      | Options for `compareTime`                                                                                                    |
-| `CompareTimeResult<A, R>`       | The return value of `compareTime`                                                                                            |
-| `CompareTimeTarget<A, R>`       | A function to measureTime `{ id, fn }`                                                                                       |
-| `CompareTimeAsyncOptions<A, R>` | Same as `CompareTimeOptions<A, Promise<R>>`                                                                                  |
-| `CompareTimeAsyncResult<A, R>`  | The return value of `compareTimeAsync`. Same as `CompareTimeResult<A, R>`, except that `order` functions return `Promise<R>` |
-| `ElapsedTimes`                  | Times per function ID `{ [id: string]: number }`                                                                             |
-| `MeasureTimeArgsOptions<A>`     | Options for the arguments passed to the function (`args` / `getArgs`)                                                        |
-| `MeasureTimeOptions<A>`         | Options for `measureTime`                                                                                                    |
-| `MeasureTimeResult<R>`          | The return value of `measureTime`                                                                                            |
-| `MeasureTimeAsyncOptions<A>`    | Same as `MeasureTimeOptions<A>`                                                                                              |
-| `MeasureTimeAsyncResult<R>`     | Same as `MeasureTimeResult<R>`                                                                                               |
-| `SearchByKeysOptions`           | Options for `searchByKeys` (same as `CreateStringMatcherOptions` of `@fringeworks/utils`)                                    |
-| `SearchByValuesOptions`         | Options for `searchByValues` (same as `CreateStringMatcherOptions` of `@fringeworks/utils`)                                  |
+| Type                            | Description                                                                                                                          |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `CompareTimeOptions<A, R>`      | Options for `compareTime`                                                                                                            |
+| `CompareTimeResult<A, R>`       | The return value of `compareTime`                                                                                                    |
+| `CompareTimeTarget<A, R>`       | A function to measureTime `{ id, fn }`                                                                                               |
+| `CompareTimeAsyncOptions<A, R>` | Same as `CompareTimeOptions<A, Promise<R>>`                                                                                          |
+| `CompareTimeAsyncResult<A, R>`  | The return value of `compareTimeAsync`. Same as `CompareTimeResult<A, R>`, except that `order` functions return `Promise<R>`         |
+| `ElapsedTimes`                  | Times per function ID `{ [id: string]: number }`                                                                                     |
+| `MeasureTimeArgsOptions<A>`     | Options for the arguments passed to the function (`args` / `getArgs`)                                                                |
+| `MeasureTimeOptions<A>`         | Options for `measureTime`                                                                                                            |
+| `MeasureTimeResult<R>`          | The return value of `measureTime`                                                                                                    |
+| `MeasureTimeAsyncOptions<A>`    | Same as `MeasureTimeOptions<A>`                                                                                                      |
+| `MeasureTimeAsyncResult<R>`     | Same as `MeasureTimeResult<R>`                                                                                                       |
+| `SearchByKeysOptions`           | Options for `searchByKeys` (same as `CreateStringMatcherOptions` of `@fringeworks/utils`)                                            |
+| `SearchByValuesOptions`         | Options for `searchByValues` (same as `CreateStringMatcherOptions` of `@fringeworks/utils`)                                          |
+| `StringComparison`              | How to compare strings, `{ includes?, startsWith?, endsWith?, matches? }` (a type of `@fringeworks/utils`)                           |
+| `StringCondition`               | The `condition` of `searchByKeys` and `searchByValues` (a `StringConditionItem` or an array of them; a type of `@fringeworks/utils`) |
+| `StringConditionItem`           | One string condition (a string, `RegExp`, `StringComparison`, or `StringPredicate`; a type of `@fringeworks/utils`)                  |
+| `StringPredicate`               | A function that tells whether a string matches, `(value: string) => boolean` (a type of `@fringeworks/utils`)                        |
 
 ## License
 
